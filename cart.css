@@ -3,14 +3,18 @@
   margin: 0;
   list-style: none;
 }
+
 html,
 body {
   background: #ccc;
 }
+
 .card {
   opacity: 0.8;
-  &:hover {
-    opacity: 1;
-    border: 10px solid #fff;
-  }
 }
+
+.card:hover {
+  opacity: 1;
+  border: 10px solid #fff;
+}
+/*# sourceMappingURL=cart.css.map */
