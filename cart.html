@@ -11,46 +11,162 @@
       integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0"
       crossorigin="anonymous"
     />
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css' integrity='sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==' crossorigin='anonymous'/>
     <link rel="stylesheet" href="cart.css" />
   </head>
   <body>
     <div id="app">
       <div class="container">
         <div class="row ">
-          <div class="col-6 col-md-4 d-flex flex-wrap">
-            <div class="card mx-auto my-5" style="width: 100%">
+          <div class="col-6 col-md-4 d-flex flex-wrap" v-for="item in products" :key="item.id">
+            <div class="card mx-auto my-5" style="width: 100%;">
               <img
-                src="https://picsum.photos/id/237/200/200"
+                :src="item.imageUrl"
                 class="card-img-top"
-                alt="..."
+                :alt="item.title"
               />
               <div class="card-body">
                 <div class="d-flex">
                   <h4 class="card-title">
-                    {{ dd }}
-                  <span class="badge bg-primary ms-2">機gj gj</span>
+                    {{ item.title }}
+                  <span class="badge bg-primary ms-2">{{ item.category }}</span>
                   </h4>
                 </div>
                 <p class="card-text">
                   <p class="text-decoration-line-through">
-                    原價:11111
+                    原價:NT{{ item.origin_price }}
                   </p>
-                  特價:222222
+                  特價:NT{{ item.price }}
                 </p>
-                <div class="d-flex justify-content-between">
-                  <a href="#" class="btn btn-outline-secondary">查看更多</a>
-                  <a href="#" class="btn btn-outline-danger">加入購物車</a>
+                <div class="d-flex justify-content-between"> 
+                  <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  @click="getProduct(item.id)"
+                  :disabled="loadingStatus.loadingItem === item.id || !item.is_enabled"
+                  >
+                    <i
+                    class="fas fa-spinner fa-pulse"
+                    v-if="loadingStatus.loadingItem === item.id"
+                  ></i>查看更多</button>
+                  <button
+                  type="button"
+                  class="btn btn-outline-danger"
+                  @click="addToCart(item.id)"
+                  :disabled="loadingStatus.loadingItem === item.id || !item.is_enabled"
+                  >
+                    <i
+                    class="fas fa-spinner fa-pulse"
+                    v-if="loadingStatus.loadingItem === item.id"
+                  ></i>加入購物車</button>
                 </div>
               </div>
             </div>
-          </div>
-   
-          
+          </div>   
         </div>
       </div>
+
+      <pagination
+      :pages="pagination"
+      @emit-pages="getProducts"
+      ></pagination>
+
+      
+      <table class="table align-middle mx-auto w-50">
+        <h1 class="text-center mt-5">購物車</h1>
+        <thead>
+          <tr>
+            <th>圖片</th>
+            <th>商品名稱</th>
+            <th>數量</th>
+            <th>價格</th>
+            <th>刪除</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in cart.carts" :key="item.id">
+            <td style="width: 200px">
+              <div
+                style="height: 100px; background-size: cover; background-position: center"
+                :style="{backgroundImage: `url(${item.product.imageUrl})`}"
+              ></div>
+            </td>
+            <td>
+              {{ item.product.title }}
+            </td>
+            <td>
+              <select name="" id="" class="form-select">
+                <option 
+                :value="num"
+                v-for="num in 8"
+                :key=`${num}${item.id}`
+                :selected="item.qty === num"
+                >{{ num }}</option>
+              </select>
+            </td>
+            <td>
+              {{ item.product.price }}
+            </td>
+            <td>
+              <i class="fas fa-trash-alt"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
+    <script type="text/x-template" id="pagination">
+      <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+        <ul class="pagination">
+          <li
+            class="page-item"
+            :class="{'disabled': pages.current_page === 1}"
+          >
+            <a
+              class="page-link"
+              href="#"
+              aria-label="Previous"
+              @click.prevent="emitPages(pages.current_page - 1)"
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li
+            v-for="(item, index) in pages.total_pages"
+            :key="index"
+            class="page-item"
+            :class="{'active': item === pages.current_page}"
+          >
+            <span
+              class="page-link"
+              v-if="item === pages.current_page"
+            >{{ item }}</span>
+            <a
+              class="page-link"
+              href="#"
+              v-else
+              @click.prevent="emitPages(item)"
+            >{{ item }}</a>
+          </li>
+          <li
+            class="page-item"
+            :class="{'disabled': pages.current_page === pages.total_pages}"
+          >
+            <a
+              class="page-link"
+              href="#"
+              aria-label="Next"
+              @click.prevent="emitPages(pages.current_page + 1)"
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </script>
+
   </body>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.js' integrity='sha512-Kg0CewqPNO/ziOJuCq5eyl3P/V6OLz/Lb1I2m+yKS3lHZcGVFN/KOew18rWP+kTsL7haYdaqGjwHQCZrN0heLQ==' crossorigin='anonymous'></script>
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
