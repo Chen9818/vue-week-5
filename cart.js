@@ -1,8 +1,7 @@
-import { createApp } from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.0.9/vue.esm-browser.js';
 const apiUrl = 'https://vue3-course-api.hexschool.io/v2';
 const apiPath = 'wei-z';
 
-const app = createApp({
+const app = Vue.createApp({
     data(){
         return{
             products:[],
@@ -11,7 +10,9 @@ const app = createApp({
             loadingStatus: {
                 loadingItem: '',
             },
-            cart:{}
+            cart:{
+                carts:[]
+            }
         }
     },
     methods: {
@@ -35,7 +36,6 @@ const app = createApp({
                 this.loadingStatus.loadingItem = '';
                 console.log(response);
                 this.product = response.data.product;
-            //   window.location.href='one.html'
             //   this.$refs.userProductModal.openModal();
             }).catch((err) => {
                 alert(err.data.message);
@@ -63,6 +63,44 @@ const app = createApp({
                 this.cart = response.data.data;
             }).catch((err) => {
                 alert(err.data.message);
+            });
+        },
+        updateCart(data) {
+            this.loadingStatus.loadingItem = data.id;
+            const url = `${apiUrl}/api/${apiPath}/cart/${data.id}`;
+            const cart = {
+                product_id: data.product_id,
+                qty: data.qty,
+            };
+            axios.put(url, { data: cart }).then((response) => {
+                alert(response.data.message);
+                this.loadingStatus.loadingItem = '';
+                this.getCart();
+            }).catch((err) => {
+                alert(err.data.message);
+                this.loadingStatus.loadingItem = '';
+            });
+        },
+        removeCartItem(data) {
+            const url = `${apiUrl}/api/${apiPath}/cart/${data.id}`;
+            this.loadingStatus.loadingItem = data.id;
+            axios.delete(url).then((response) => {
+                alert(response.data.message);
+                this.loadingStatus.loadingItem = '';
+                this.getCart();
+            }).catch((err) => {
+                alert(err.data.message);
+            });
+        },
+        deleteAllCarts(data) {
+            const url = `${apiUrl}/api/${apiPath}/carts`;
+            this.loadingStatus.loadingItem = data;
+            axios.delete(url).then((response) => {
+                alert(response.data.message);
+                this.loadingStatus.loadingItem = '';
+                this.getCart();
+            }).catch((err) => {
+                ert(err.data.message);
             });
         },
     },

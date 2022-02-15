@@ -38,7 +38,7 @@
                   </p>
                   特價:NT{{ item.price }}
                 </p>
-                <div class="d-flex justify-content-between"> 
+                <div class="d-flex justify-content-between">
                   <button
                   type="button"
                   class="btn btn-outline-secondary"
@@ -65,54 +65,145 @@
           </div>   
         </div>
       </div>
-
+      
       <pagination
       :pages="pagination"
       @emit-pages="getProducts"
       ></pagination>
 
+      <div class="d-md-block d-none">
+        <table class="table align-middle mx-auto" style="width: 80%;">
+          <div style="width: 80%;" class="mx-auto mb-3 d-flex justify-content-between">
+            <h1>購物車</h1>
+            <button
+            type="button"
+            class="btn btn-outline-secondary mb-3"
+            @click="deleteAllCarts('open')"
+            :disabled="cart.carts.length === 0 || loadingStatus.loadingItem === 'open'"
+            >
+              <i
+              class="fas fa-spinner fa-pulse"
+              v-if="loadingStatus.loadingItem === 'open'"
+            ></i>清空購物車</button>
+          </div>
+          <thead>
+            <tr>
+              <th>圖片</th>
+              <th>商品名稱</th>
+              <th>數量</th>
+              <th>價格</th>
+              <th>刪除</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in cart.carts" :key="item.id" >
+              <td style="width: 200px">
+                <div
+                  style="height: 100px; background-size: cover; background-position: center"
+                  :style="{backgroundImage: `url(${item.product.imageUrl})`}"
+                ></div>
+              </td>
+              <td>
+                {{ item.product.title }}
+              </td>
+              <td>
+                <select name="productNum" class="form-select" style="width: 100%;"
+                v-model="item.qty"
+                @change="updateCart(item)"
+                :disabled="loadingStatus.loadingItem === item.id"
+                >
+                  <option 
+                  :value="num"
+                  v-for="num in 8"
+                  :key=`${num}${item.id}`
+                  >{{ num }}</option>
+                </select>
+              </td>
+              <td>
+                {{ item.product.price*item.qty }}
+              </td>
+              <td>
+                <i class="fas fa-trash-alt w-100"
+                type="button"
+                @click="removeCartItem(item)"
+                :disabled="loadingStatus.loadingItem === item.id"
+                >
+                </i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="w-100">
+          <div style="width: 80%;" class="mx-auto d-flex justify-content-end">
+            <h2 v-if="cart.final_total>0">
+              總金額:{{cart.final_total}}
+            </h2>
+          </div>
+        </div>
+      </div>
       
-      <table class="table align-middle mx-auto w-50">
-        <h1 class="text-center mt-5">購物車</h1>
-        <thead>
-          <tr>
-            <th>圖片</th>
-            <th>商品名稱</th>
-            <th>數量</th>
-            <th>價格</th>
-            <th>刪除</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in cart.carts" :key="item.id">
-            <td style="width: 200px">
-              <div
+      <!--RWD-->
+      <ul class="d-md-none w-100 p-0 m-0">
+        <div style="width: 80%;border-bottom:1px solid #000;" class="mx-auto mb-3 d-flex justify-content-between">
+          <h1>購物車</h1>
+          <button
+          type="button"
+          class="btn btn-outline-secondary mb-3"
+          @click="deleteAllCarts('open')"
+          :disabled="cart.carts.length === 0 || loadingStatus.loadingItem === 'open'"
+          >
+            <i
+            class="fas fa-spinner fa-pulse"
+            v-if="loadingStatus.loadingItem === 'open'"
+          ></i>清空購物車</button>
+        </div>
+        <li v-for="item in cart.carts" class="mx-auto mb-3" style="width: 80%;">
+          <div class="card" style="width:100%">
+            <div class="card-body d-flex">
+              <div style="width: 100px;">
+                <div
                 style="height: 100px; background-size: cover; background-position: center"
                 :style="{backgroundImage: `url(${item.product.imageUrl})`}"
-              ></div>
-            </td>
-            <td>
-              {{ item.product.title }}
-            </td>
-            <td>
-              <select name="" id="" class="form-select">
-                <option 
-                :value="num"
-                v-for="num in 8"
-                :key=`${num}${item.id}`
-                :selected="item.qty === num"
-                >{{ num }}</option>
-              </select>
-            </td>
-            <td>
-              {{ item.product.price }}
-            </td>
-            <td>
-              <i class="fas fa-trash-alt"></i>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                ></div>
+              </div>
+              <div style="width: 400px;">
+                <div class="text-center mb-3">
+                  {{ item.product.title }} 
+                </div>
+                <select name="productNum" class="form-select mx-auto mb-3" style="width: 80%;"
+                v-model="item.qty"
+                @change="updateCart(item)"
+                :disabled="loadingStatus.loadingItem === item.id"
+                >
+                  <option 
+                  :value="num"
+                  v-for="num in 8"
+                  :key=`${num}${item.id}`
+                  >{{ num }}</option>
+                </select>
+                <div class="text-center">
+                  <span>金額:</span>
+                  {{item.product.price}}
+                  <i class="fas fa-trash-alt px-5"
+                  type="button"
+                  @click="removeCartItem(item)"
+                  :disabled="loadingStatus.loadingItem === item.id"
+                  >
+                  </i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <div class="w-100">
+          <div style="width: 80%;" class="mx-auto d-flex justify-content-end">
+            <h2 v-if="cart.final_total>0">
+              總金額:{{cart.final_total}}
+            </h2>
+          </div>
+        </div>
+      </ul>
+      
     </div>
 
     <script type="text/x-template" id="pagination">
@@ -172,5 +263,9 @@
     integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
     crossorigin="anonymous"
   ></script>
+  
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-loading-overlay@5.0.3/dist/vue-loading.min.js"></script>
+  <script src="https://unpkg.com/vue-router@4.0.5/dist/vue-router.global.js"></script>
   <script src="cart.js" type="module"></script>
 </html>
