@@ -183,7 +183,7 @@
                 </select>
                 <div class="text-center">
                   <span>金額:</span>
-                  {{item.product.price}}
+                  {{ item.product.price*item.qty }}
                   <i class="fas fa-trash-alt px-5"
                   type="button"
                   @click="removeCartItem(item)"
@@ -215,7 +215,7 @@
           @submit="createOrder"
         >
           <div class="mb-3">
-            <label for="name" class="form-label">收件人姓名</label>
+            <label for="name" class="form-label">收件人姓名<span class="px-1" style="color: #f00;">*</span></label>
             <v-field
               id="name"
               name="姓名"
@@ -233,7 +233,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="email" class="form-label">收件人電子郵件</label>
+            <label for="email" class="form-label">收件人電子郵件<span class="px-1" style="color: #f00;">*</span></label>
             <v-field
               id="email"
               name="email"
@@ -251,7 +251,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="tel" class="form-label">收件人電話</label>
+            <label for="tel" class="form-label">收件人電話<span class="px-1" style="color: #f00;">*</span></label>
             <v-field
               id="tel"
               name="電話"
@@ -269,7 +269,7 @@
           </div>
 
           <div class="mb-3">
-            <label for="address" class="form-label">收件人地址</label>
+            <label for="address" class="form-label">收件人地址<span class="px-1" style="color: #f00;">*</span></label>
             <v-field
               id="address"
               name="地址"
@@ -298,7 +298,9 @@
             ></textarea>
           </div>
           <div class="text-end">
-            <button type="submit" class="btn btn-danger">送出訂單</button>
+            <button type="submit" class="btn btn-danger"
+            :disabled="Object.keys(errors).length > 0 || cart.carts.length === 0"
+            >送出訂單</button>
           </div>
         </v-form>
       </div>
@@ -354,7 +356,6 @@
         </ul>
       </nav>
     </script>
- 
   </body>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.js' integrity='sha512-Kg0CewqPNO/ziOJuCq5eyl3P/V6OLz/Lb1I2m+yKS3lHZcGVFN/KOew18rWP+kTsL7haYdaqGjwHQCZrN0heLQ==' crossorigin='anonymous'></script>
   <script
@@ -367,6 +368,5 @@
   <script src="https://unpkg.com/vee-validate@next"></script>
   <script src="https://unpkg.com/@vee-validate/i18n@4.1.0"></script>
   <script src="https://unpkg.com/@vee-validate/rules"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue-loading-overlay@5.0.2/dist/vue-loading.min.js"></script>
   <script src="cart.js"></script>
 </html>
